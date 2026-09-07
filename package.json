@@ -1,0 +1,11 @@
+{
+  "name": "opencodex-gpt-gemini-gpt-harness",
+  "private": true,
+  "description": "Portable OpenCodex GPT -> Gemini -> GPT orchestration harness",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

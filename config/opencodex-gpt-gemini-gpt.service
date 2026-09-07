@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenCodex GPT-Gemini-GPT proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=__OCX_PATH__ start
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
