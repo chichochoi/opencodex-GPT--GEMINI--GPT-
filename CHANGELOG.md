@@ -7,3 +7,4 @@
 - Add GPT review and re-delegation policy.
 - Add proxy auto-start configuration and installation verification.
 - Add CI checks that reject API-key-based Gemini routing in executable scripts.
+- Make the test command portable to Windows npm shells and update CI actions.
