@@ -15,8 +15,18 @@ if (Get-Command ocx -ErrorAction SilentlyContinue) {
     Check ($LASTEXITCODE -eq 0) "OpenCodex proxy is healthy"
 
     $AgentStatus = (& ocx agent status 2>&1 | Out-String)
-    Check ($AgentStatus -match [regex]::Escape("google-antigravity/gemini-3.8-flash")) "Gemini worker is exactly Antigravity Gemini 3.8 Flash"
+    $ExpectedWorkers = @(
+        "google-antigravity/gemini-3.8-flash",
+        "korea-llm/gemini-3.8-flash",
+        "korea-llm/gpt-5.6-luna",
+        "gpt-5.6-luna"
+    )
+    foreach ($Worker in $ExpectedWorkers) {
+        Check ($AgentStatus -match [regex]::Escape($Worker)) "worker is configured: $Worker"
+    }
     Check ($AgentStatus -notmatch "google-vertex/") "Google Vertex is not in the worker route"
+    $FallbackStatus = (& ocx agent fallback status 2>&1 | Out-String)
+    Check ($FallbackStatus -match "models:\s*none") "subagent fallback list is empty"
 
     $V2Status = (& ocx v2 status 2>&1 | Out-String)
     Check ($V2Status -match "multi_agent_v2:\s*ON") "multi_agent_v2 is enabled"
@@ -30,7 +40,8 @@ $ConfigPath = Join-Path $CodexHome "config.toml"
 $AgentsPath = Join-Path $CodexHome "AGENTS.md"
 $Config = if (Test-Path -LiteralPath $ConfigPath) { Get-Content -LiteralPath $ConfigPath -Raw } else { "" }
 $Agents = if (Test-Path -LiteralPath $AgentsPath) { Get-Content -LiteralPath $AgentsPath -Raw } else { "" }
-Check ($Config -match '(?m)^model\s*=\s*"gpt-6-astra"') "default GPT model is gpt-6-astra"
+Check ($Config -match '(?m)^model\s*=\s*"gpt-5\.6-terra"') "default GPT model is gpt-5.6-terra"
+Check ($Config -match '(?m)^model_reasoning_effort\s*=\s*"high"') "default reasoning effort is high"
 Check ($Agents -match "BEGIN OPENCODEX GPT-GEMINI-GPT HARNESS") "global delegation policy is installed"
 Check ([bool](Get-ScheduledTask -TaskName "OpenCodex GPT-Gemini-GPT AutoStart" -ErrorAction SilentlyContinue)) "Windows logon auto-start task exists"
 

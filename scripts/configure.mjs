@@ -37,8 +37,8 @@ if (!fs.existsSync(configPath)) {
 
 backup(configPath);
 let config = fs.readFileSync(configPath, "utf8");
-config = setRootTomlValue(config, "model", "gpt-6-astra");
-config = setRootTomlValue(config, "model_reasoning_effort", "low");
+config = setRootTomlValue(config, "model", "gpt-5.6-terra");
+config = setRootTomlValue(config, "model_reasoning_effort", "high");
 fs.writeFileSync(configPath, config, "utf8");
 
 const policy = fs.readFileSync(policyPath, "utf8").trim();

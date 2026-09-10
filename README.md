@@ -1,25 +1,28 @@
 # OpenCodex GPT -> Gemini -> GPT Harness
 
-Codex의 기본 GPT 모델이 문제를 분석하고, 구현 단위를 Google Antigravity의 Gemini Flash에 위임한 뒤, 결과를 다시 GPT가 검토하도록 설정하는 설치형 하네스입니다.
+Codex의 기본 GPT 모델이 문제를 분석하고, 구현 단위를 지정된 워커 모델에 위임한 뒤, 결과를 다시 GPT가 검토하도록 설정하는 설치형 하네스입니다.
 
 ## 보장하는 동작
 
-- 오케스트레이터와 리뷰어: `gpt-6-astra`
-- 구현 워커: `google-antigravity/gemini-3.8-flash` 단일 모델
-- Gemini 인증: Google Antigravity OAuth만 사용
-- Gemini API 키 기반 provider는 설치하지 않음
-- Gemini fallback을 비워 다른 모델이나 provider로 조용히 전환되지 않게 함
-- GPT가 모든 Gemini 결과를 검토하고, 실패 시 더 작은 문제로 다시 위임
-- Codex 실행 시 shim이 프록시를 확인하고, OS 로그인 시에도 프록시 서비스를 자동 시작
+- 기본 오케스트레이터: `gpt-5.6-terra`
+- 기본 추론 강도: `high`
+- 구현 워커 roster: `google-antigravity/gemini-3.8-flash`, `korea-llm/gemini-3.8-flash`, `korea-llm/gpt-5.6-luna`, `gpt-5.6-luna`
+- Gemini 작업: `google-antigravity/gemini-3.8-flash`와 Google Antigravity OAuth를 우선 사용
+- Gemini API 키 기반 `google`/`google-vertex` provider는 사용하지 않음
+- 일반적인 subagent fallback 목록은 비워 조용한 provider 전환을 막음
+- Antigravity Gemini가 토큰을 소진한 경우에만 injection policy가 `korea-llm/gpt-5.6-luna` 위임을 허용
+- GPT가 워커 결과를 검토하고, 실패 시 더 작은 작업으로 재위임
+- Codex 실행 시 로컬 OpenCodex 프록시와 모델 카탈로그를 사용
 
-> 사용자는 각자 Codex/ChatGPT 로그인과 Google Antigravity OAuth 승인을 완료해야 합니다. 인증 정보는 저장소에 포함되지 않습니다. Google 요금제의 실제 사용 가능 모델과 quota는 Google 계정 정책에 따릅니다.
+> 사용자는 각자 Codex/ChatGPT 로그인과 Google Antigravity OAuth 승인을 완료해야 합니다. 인증 정보, API 키, OAuth 토큰, 사용자별 경로는 저장소에 포함되지 않습니다. 모델 접근 권한과 quota는 각 provider 계정 정책에 따릅니다.
 
 ## 요구 사항
 
 - Node.js 20 이상과 npm
 - Codex CLI 또는 Codex Desktop
 - OpenAI 계정 로그인
-- Gemini 3.8 Flash를 사용할 수 있는 Google Antigravity 계정
+- Google Antigravity OAuth 계정
+- `korea-llm` 모델을 사용하려면 별도 provider 인증 및 모델 권한
 
 ## Windows 설치
 
@@ -59,7 +62,7 @@ macOS / Linux:
 ./scripts/verify.sh
 ```
 
-검증은 proxy 상태, 정확한 Gemini worker, OAuth 계정, `multi_agent_v2`, GPT 기본 모델, 전역 정책, 자동 시작 등록을 확인합니다. 실제 루프 테스트 후 `ocx observe logs --limit 20`에서 GPT 요청 사이의 `google-antigravity/gemini-3.8-flash` 요청을 확인할 수 있습니다.
+검증은 proxy 상태, 워커 roster, fallback 비활성화, OAuth 계정, `multi_agent_v2`, 기본 모델과 추론 강도, 전역 정책, 자동 시작 등록을 확인합니다.
 
 ## 기존 설치에 적용
 

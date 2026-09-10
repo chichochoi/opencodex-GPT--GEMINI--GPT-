@@ -20,11 +20,22 @@ v2_status="$(ocx v2 status 2>&1 || true)"
 account_status="$(ocx account current google-antigravity 2>&1 || true)"
 codex_home="${CODEX_HOME:-$HOME/.codex}"
 
-if grep -Fq 'google-antigravity/gemini-3.8-flash' <<<"$agent_status"; then pass "Gemini worker is exactly Antigravity Gemini 3.8 Flash"; else fail "Gemini worker is exactly Antigravity Gemini 3.8 Flash"; fi
+expected_workers=(
+  'google-antigravity/gemini-3.8-flash'
+  'korea-llm/gemini-3.8-flash'
+  'korea-llm/gpt-5.6-luna'
+  'gpt-5.6-luna'
+)
+for worker in "${expected_workers[@]}"; do
+  if grep -Fq "$worker" <<<"$agent_status"; then pass "worker is configured: $worker"; else fail "worker is configured: $worker"; fi
+done
 if grep -Fq 'google-vertex/' <<<"$agent_status"; then fail "Google Vertex is not in the worker route"; else pass "Google Vertex is not in the worker route"; fi
+fallback_status="$(ocx agent fallback status 2>&1 || true)"
+if grep -Eq 'models:[[:space:]]*none' <<<"$fallback_status"; then pass "subagent fallback list is empty"; else fail "subagent fallback list is empty"; fi
 if grep -Eq 'multi_agent_v2:[[:space:]]*ON' <<<"$v2_status"; then pass "multi_agent_v2 is enabled"; else fail "multi_agent_v2 is enabled"; fi
 if grep -Eqi 'no active|not found|error' <<<"$account_status"; then fail "Google Antigravity OAuth account is active"; else pass "Google Antigravity OAuth account is active"; fi
-if grep -Eq '^model[[:space:]]*=[[:space:]]*"gpt-6-astra"' "$codex_home/config.toml"; then pass "default GPT model is gpt-6-astra"; else fail "default GPT model is gpt-6-astra"; fi
+if grep -Eq '^model[[:space:]]*=[[:space:]]*"gpt-5\.6-terra"' "$codex_home/config.toml"; then pass "default GPT model is gpt-5.6-terra"; else fail "default GPT model is gpt-5.6-terra"; fi
+if grep -Eq '^model_reasoning_effort[[:space:]]*=[[:space:]]*"high"' "$codex_home/config.toml"; then pass "default reasoning effort is high"; else fail "default reasoning effort is high"; fi
 if grep -Fq 'BEGIN OPENCODEX GPT-GEMINI-GPT HARNESS' "$codex_home/AGENTS.md"; then pass "global delegation policy is installed"; else fail "global delegation policy is installed"; fi
 
 if [[ "$(uname -s)" == "Darwin" ]]; then

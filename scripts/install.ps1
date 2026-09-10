@@ -64,12 +64,12 @@ if (-not $SkipOAuthLogin) {
 & node (Join-Path $PSScriptRoot "configure.mjs")
 if ($LASTEXITCODE -ne 0) { throw "Codex policy configuration failed." }
 
-$Recovery = '{"enabled":true,"model":"gpt-6-astra","timeoutMs":60000,"cacheEntries":200}'
+$Recovery = @{ enabled = $true; model = "gpt-6-astra"; timeoutMs = 60000; cacheEntries = 200 } | ConvertTo-Json -Compress
 & ocx config set agentTaskRecovery $Recovery
 if ($LASTEXITCODE -ne 0) { throw "Agent task recovery configuration failed." }
 
 $InjectionPrompt = (Get-Content -LiteralPath $PromptPath -Raw).Trim()
-& ocx agent subagents set "google-antigravity/gemini-3.8-flash"
+& ocx agent subagents set "google-antigravity/gemini-3.8-flash,korea-llm/gemini-3.8-flash,korea-llm/gpt-5.6-luna,gpt-5.6-luna"
 if ($LASTEXITCODE -ne 0) { throw "Gemini subagent configuration failed." }
 & ocx agent fallback clear
 if ($LASTEXITCODE -ne 0) { throw "Subagent fallback could not be cleared." }

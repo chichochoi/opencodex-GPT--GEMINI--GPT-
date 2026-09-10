@@ -31,7 +31,7 @@ echo "A browser will open for Google Antigravity OAuth. No Gemini API key is use
 ocx login google-antigravity
 node "$SCRIPT_DIR/configure.mjs"
 ocx config set agentTaskRecovery '{"enabled":true,"model":"gpt-6-astra","timeoutMs":60000,"cacheEntries":200}'
-ocx agent subagents set 'google-antigravity/gemini-3.8-flash'
+ocx agent subagents set 'google-antigravity/gemini-3.8-flash,korea-llm/gemini-3.8-flash,korea-llm/gpt-5.6-luna,gpt-5.6-luna'
 ocx agent fallback clear
 ocx v2 on
 ocx agent injection set --guidance on --prompt "$PROMPT"

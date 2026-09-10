@@ -12,7 +12,9 @@ const executableFiles = ["scripts/install.ps1", "scripts/install.sh", "scripts/c
 
 test("pins the exact orchestrator and worker models", () => {
   const content = executableFiles.map(read).join("\n");
-  assert.match(content, /gpt-6-astra/);
+  assert.match(content, /gpt-5\.6-terra/);
+  assert.match(content, /model_reasoning_effort.*high/);
+  assert.match(content, /korea-llm\/gpt-5\.6-luna/);
   assert.match(content, /google-antigravity\/gemini-3\.8-flash/);
 });
 
@@ -67,8 +69,8 @@ test("configuration preserves existing content and is idempotent", () => {
 
   const configured = fs.readFileSync(config, "utf8");
   const policy = fs.readFileSync(agents, "utf8");
-  assert.match(configured, /^model = "gpt-6-astra"/m);
-  assert.match(configured, /^model_reasoning_effort = "low"/m);
+  assert.match(configured, /^model = "gpt-5.6-terra"/m);
+  assert.match(configured, /^model_reasoning_effort = "high"/m);
   assert.match(configured, /^custom_root = true$/m);
   assert.match(configured, /^\[features\]$/m);
   assert.match(configured, /^web_search = true$/m);
